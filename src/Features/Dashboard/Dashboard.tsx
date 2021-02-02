@@ -12,6 +12,13 @@ import Chart from '../../components/Chart';
 const useStyles = makeStyles({
   card: {
     margin: '1%',
+    padding: '1rem',
+  },
+  cardContain: {
+    padding: '1rem',
+    width: '70%',
+    display: 'flex',
+    flexWrap: 'nowrap',
   },
 });
 
@@ -142,7 +149,22 @@ const Dashboard = () => {
   return (
     <div style={styleTopCardContent.contain}>
       <div style={styleTopCardContent.div}>
-        <div style={styleTopCardContent.chips}></div>
+        <div style={styleTopCardContent.chips}>
+          <div className={classes.cardContain}>
+            {measurements.map(d => {
+              return (
+                <Card className={classes.card}>
+                  <CardContent>
+                    <div>
+                      <b>{d.metric}</b>
+                    </div>
+                    <div>{d.measurements[d.measurements.length - 1].value}</div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
         <div style={styleTopCardContent.selectDiv}>
           <MultipleSelect names={metrics} onSelectChange={onSelectChange} />
         </div>
