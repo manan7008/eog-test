@@ -49,12 +49,12 @@ export default function Chart(props: ChartProps) {
       <CartesianGrid strokeDasharray="3 3" />
       <XAxis dataKey="atValue" />
       {props.measurements.map((d: Measurement, i: number) => (
-        <YAxis yAxisId={'left'} key={i} />
+        <YAxis yAxisId={i} key={i} />
       ))}
       <Tooltip />
       <Legend />
       {props.measurements.map((d: Measurement, i: number) => (
-        <Line yAxisId={'left'} key={i} type="monotone" dataKey={d.metric} dot={false} stroke={randomColor()} />
+        <Line yAxisId={i} key={i} type="monotone" dataKey={d.metric} dot={false} stroke={randomColor()} />
       ))}
     </LineChart>
   );
