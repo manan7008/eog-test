@@ -1,28 +1,58 @@
-import React from 'react';
+import { ApolloClient, ApolloProvider, HttpLink, InMemoryCache, split } from '@apollo/client';
+import { setContext } from '@apollo/client/link/context';
+import { WebSocketLink } from '@apollo/client/link/ws';
+import { getMainDefinition } from '@apollo/client/utilities';
+import * as React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import { ApolloProvider } from 'react-apollo';
-import { InMemoryCache } from 'apollo-cache-inmemory';
-import { SubscriptionClient } from 'subscriptions-transport-ws';
-import ApolloClient from 'apollo-client';
 
-// Create WebSocket client
-const WSClient = new SubscriptionClient(`wss://react.eogresources.com/graphql`, {
-  reconnect: true,
-  connectionParams: {
-    // Connection parameters to pass some validations
-    // on server side during first handshake
+// HTTP Link
+const httpLink = new HttpLink({
+  uri: `wss://react.eogresources.com/graphql/query`,
+});
+
+// Adds Authentication Headers on HTTP as well as was requests
+const authLink = setContext((_, { headers }) => {
+  return {
+    headers: {
+      ...headers,
+    },
+  };
+});
+
+// WebSocket Link
+const wsLink = new WebSocketLink({
+  uri: `wss://react.eogresources.com/graphql/query`,
+  options: {
+    reconnect: true,
+    lazy: true,
   },
 });
 
-const GraphQLClient = new ApolloClient({
-  link: WSClient,
+// Send query request based on the type definition
+const link = split(
+  ({ query }) => {
+    const definition = getMainDefinition(query);
+    return definition.kind === 'OperationDefinition' && definition.operation === 'subscription';
+  },
+  authLink.concat(wsLink),
+  authLink.concat(httpLink),
+);
+
+// Apollo Client
+export const client = new ApolloClient({
+  link,
   cache: new InMemoryCache(),
 });
 
-ReactDOM.render(
-  <ApolloProvider client={GraphQLClient}>
-    <App />
-  </ApolloProvider>,
-  document.getElementById('root'),
-);
+const ReduxRoot = () => {
+  return (
+    <ApolloProvider client={client}>
+      <App />
+    </ApolloProvider>
+  );
+};
+
+ReactDOM.render(<ReduxRoot />, document.getElementById('root'));
+
+export default ReduxRoot;
