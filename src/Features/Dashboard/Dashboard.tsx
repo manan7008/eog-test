@@ -2,8 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as actions from '../../store/actions';
 import { Provider, createClient, useQuery } from 'urql';
-// import { useGeolocation } from "react-use";
-// import LinearProgress from "@material-ui/core/LinearProgress";
+import { DashboardState, Measurement } from '../../models';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import { makeStyles } from '@material-ui/core/styles';
@@ -40,14 +39,14 @@ query($input: [MeasurementQuery]) {
 }
 `;
 
-const getMetrics = (state: any) => {
+const getMetrics = (state: { dashboard: DashboardState }): { metrics: string[] } => {
   const { metrics } = state.dashboard;
   return {
     metrics,
   };
 };
 
-const getMeasurements = (state: any) => {
+const getMeasurements = (state: { dashboard: DashboardState }): { measurements: Measurement[] } => {
   const { measurements } = state.dashboard;
   return {
     measurements,
@@ -60,6 +59,24 @@ export default () => {
       <Dashboard />
     </Provider>
   );
+};
+
+var styleTopCardContent = {
+  div: {
+    display: 'flex',
+    justifyContent: 'space-between',
+  },
+  selectDiv: {
+    width: '30%',
+  },
+  chips: {
+    width: '70%',
+  },
+  contain: {
+    margin: '1rem',
+    'background-color': '#fafafa',
+    height: '94%',
+  },
 };
 
 const Dashboard = () => {
@@ -90,7 +107,7 @@ const Dashboard = () => {
     query: fetMetricsQuery,
     variables: {},
   });
-  const { fetching, data, error } = result;
+  const { data, error } = result;
 
   const [result2] = useQuery({
     query: fetchData,
@@ -123,11 +140,16 @@ const Dashboard = () => {
   }, [result2]);
 
   return (
-    <Card className={classes.card}>
-      <CardContent>
-        <MultipleSelect names={metrics} onSelectChange={onSelectChange} />
+    <div style={styleTopCardContent.contain}>
+      <div style={styleTopCardContent.div}>
+        <div style={styleTopCardContent.chips}></div>
+        <div style={styleTopCardContent.selectDiv}>
+          <MultipleSelect names={metrics} onSelectChange={onSelectChange} />
+        </div>
+      </div>
+      <div>
         <Chart measurements={measurements} />
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };

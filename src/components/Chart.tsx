@@ -2,13 +2,18 @@ import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import _ from 'lodash';
 import moment from 'moment';
+import { Measurement } from '../models';
 
 const randomColor = () => `#${(0x1000000 + Math.random() * 0xffffff).toString(16).substr(1, 6)}`;
 
-export default function Chart(props: any) {
+interface ChartProps {
+  measurements: any;
+}
+
+export default function Chart(props: ChartProps) {
   const mergedObjects: any = [];
 
-  if (!props.measurements || !props.measurements.length) return <div>Select metric to load chart data</div>;
+  if (!props.measurements || !props.measurements.length) return <div></div>;
 
   _.forEach(props.measurements[0].measurements, function(item, index) {
     const measurements = _.map(props.measurements, 'measurements');
@@ -43,12 +48,12 @@ export default function Chart(props: any) {
     >
       <CartesianGrid strokeDasharray="3 3" />
       <XAxis dataKey="atValue" />
-      {props.measurements.map((d: any, i: any) => (
+      {/* {props.measurements.map((d: Measurement, i: number) => (
         <YAxis yAxisId={i} key={i} />
-      ))}
+      ))} */}
       <Tooltip />
       <Legend />
-      {props.measurements.map((d: any, i: any) => (
+      {props.measurements.map((d: Measurement, i: number) => (
         <Line yAxisId={i} key={i} type="monotone" dataKey={d.metric} dot={false} stroke={randomColor()} />
       ))}
     </LineChart>

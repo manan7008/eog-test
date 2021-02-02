@@ -1,5 +1,5 @@
 import React from 'react';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { makeStyles, Theme, useTheme } from '@material-ui/core/styles';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -14,8 +14,7 @@ const useStyles = makeStyles(theme => ({
   },
   formControl: {
     margin: theme.spacing(1),
-    minWidth: 800,
-    maxWidth: 800,
+    width: '100%',
   },
   chips: {
     display: 'flex',
@@ -40,14 +39,19 @@ const MenuProps = {
   },
 };
 
-function getStyles(name: any, personName: any, theme: any) {
+function getStyles(name: string, personName: any, theme: Theme) {
   return {
     fontWeight:
       personName.indexOf(name) === -1 ? theme.typography.fontWeightRegular : theme.typography.fontWeightMedium,
   };
 }
 
-export default function MultipleSelect(props: any) {
+interface MultipleSelectProps {
+  names: string[];
+  onSelectChange: (value: any) => void;
+}
+
+export default function MultipleSelect(props: MultipleSelectProps) {
   const classes = useStyles();
   const theme = useTheme();
   const [personName, setPersonName] = React.useState([]);
@@ -68,14 +72,14 @@ export default function MultipleSelect(props: any) {
           input={<Input id="select-multiple-chip" />}
           renderValue={(selected: any) => (
             <div className={classes.chips}>
-              {selected.map((value: any) => (
+              {selected.map((value: string) => (
                 <Chip key={value} label={value} className={classes.chip} />
               ))}
             </div>
           )}
           MenuProps={MenuProps}
         >
-          {props.names.map((name: any) => (
+          {props.names.map((name: string) => (
             <MenuItem key={name} value={name} style={getStyles(name, personName, theme)}>
               {name}
             </MenuItem>
